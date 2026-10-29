@@ -15,9 +15,9 @@ int main(int argc, char** argv) {
   std::shared_ptr<LivoxLidarLoggerCfg> logger_cfg;
   std::shared_ptr<LivoxLidarSdkFrameworkCfg> framework_cfg;
   assert(parser.Parse(lidars, custom_lidars, logger_cfg, framework_cfg));
-  assert(lidars && lidars->size() == 1);
-
-  const auto& cfg = lidars->front();
+  assert(lidars && custom_lidars);
+  assert(lidars->size() + custom_lidars->size() == 1);
+  const auto& cfg = lidars->empty() ? custom_lidars->front() : lidars->front();
   assert(cfg.device_type == std::atoi(argv[2]));
   assert(cfg.lidar_net_info.cmd_data_port == 56100);
   assert(cfg.lidar_net_info.push_msg_port == 56200);
