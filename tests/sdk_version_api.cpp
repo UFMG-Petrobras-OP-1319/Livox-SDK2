@@ -1,19 +1,22 @@
-#include <cassert>
+#include <dlfcn.h>
+#include <iostream>
 
 #include "livox_lidar_api.h"
 
 int main() {
   LivoxLidarSdkVer version{};
   GetLivoxLidarSdkVer(&version);
-  assert(version.major == 1);
-  assert(version.minor == 3);
-  assert(version.patch == 1);
+  if (version.major != 1 || version.minor != 3 || version.patch != 1) {
+    std::cerr << "expected SDK version 1.3.1, got " << version.major << '.'
+              << version.minor << '.' << version.patch << '\n';
+    return 1;
+  }
 
-  // Link-time references guard the newly exported API symbols without sending
-  // configuration commands to hardware.
-  auto esc_mode_api = &SetLivoxLidarEscMode;
-  auto pps_mode_api = &SetLivoxLidarPpsSyncMode;
-  (void)esc_mode_api;
-  (void)pps_mode_api;
+  // Check the loaded shared object at runtime without sending device commands.
+  if (dlsym(RTLD_DEFAULT, "SetLivoxLidarEscMode") == nullptr ||
+      dlsym(RTLD_DEFAULT, "SetLivoxLidarPpsSyncMode") == nullptr) {
+    std::cerr << "expected ESC and PPS API symbols in the loaded SDK\n";
+    return 1;
+  }
   return 0;
 }
