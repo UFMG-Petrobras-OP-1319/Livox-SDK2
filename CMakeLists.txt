@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(livox_sdk2)
+include(CTest)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -18,3 +19,6 @@ endif(UNIX)
 
 add_subdirectory(sdk_core)
 add_subdirectory(samples)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
